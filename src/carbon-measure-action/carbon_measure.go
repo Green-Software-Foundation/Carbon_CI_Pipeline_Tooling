@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	pa "main/pkg/poweradapter"
-
-	//EM "main/pkg/electricitymap
 	iac "main/pkg/infraascode"
 	"os"
 	"strings"
@@ -61,18 +59,13 @@ func main() {
 	fmt.Println("grams_emitted_over_24h", Totalco2perkwh)
 	fmt.Println("Successfully ran carbon measure action.")
 
-	gitHubOutputVariable("grams_carbon_equivalent_per_kwh", fmt.Sprint(averageKwh))
-	gitHubOutputVariable("grams_emitted_over_24h", fmt.Sprint(Totalco2perkwh))
+	gitHubOutputVariable("set-output name=grams_carbon_equivalent_per_kwh", fmt.Sprint(averageKwh))
+	gitHubOutputVariable("set-output name=grams_emitted_over_24h", fmt.Sprint(Totalco2perkwh))
 	githubNoticeMessage("Successfully ran carbon measure action.")
 }
 
 func getCarbonIntensity(param pa.TypCarbonQueryParams) float64 {
-
 	x := pa.LiveCarbonIntensity(param)
-	if x.LiveCarbonIntensity < 1 {
-		x.LiveCarbonIntensity = 200 //  dummy
-	}
-
 	return x.LiveCarbonIntensity
 }
 

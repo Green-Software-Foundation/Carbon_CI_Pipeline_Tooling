@@ -1,0 +1,44 @@
+  name: Calculate Carbon
+  
+  on:
+    pull_request:
+      branches:
+        - Dev
+      types: [opened, synchronize, reopened]
+        
+  jobs:
+    carbon-measure:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3
+        - uses: actions/setup-go@v3
+          with:
+            go-version: 1.17
+        - name: Set and check goenv
+          run: |
+              go env -w GO111MODULE=on
+              go version && go env
+        - id: carbon_output
+          uses: Willmish/Carbon_CI_Pipeline_Tooling@gh-action-comment-output
+          with:
+            IACFile: $GITHUB_WORKSPACE/data/azuredeploy.json
+            IACType: arm
+            CloudProvider: azure
+            CARBON_RATE_PROVIDER: watttime
+          env:
+            ELECTRICITY_MAP_AUTH_TOKEN: ${{ secrets.ELECTRICITY_MAP_AUTH_TOKEN }}
+            WATT_TIME_USER: ${{ secrets.WATT_TIME_USER }}
+            WATT_TIME_PASS: ${{ secrets.WATT_TIME_PASS }}
+          
+        - name: Create comment
+          uses: peter-evans/create-or-update-comment@v2
+          with:
+            issue-number: ${{ github.event.pull_request.number }}
+            body: |
+              grams_carbon_equivalent_per_kwh = ${{ steps.carbon_output.outputs.grams_carbon_equivalent_per_kwh }}
+              grams_emitted_over_24h = ${{ steps.carbon_output.outputs.grams_emitted_over_24h }}
+            reactions: rocket
+        
+        
+    
+

@@ -19,8 +19,11 @@ inputs:
 outputs:
   grams_carbon_equivalent_per_kwh:
     description: "Grams of Carbon Equivalent per kWh for the selected location"
+    value: ${{ steps.action-output.outputs.grams_carbon_equivalent_per_kwh }}
   grams_emitted_over_24h:
     description: "Grams of Carbon Equivalents emitted over 24 hours"
+    value: ${{ steps.action-output.outputs.grams_emitted_over_24h }}
+
 runs:
   using: composite
   steps:
@@ -57,8 +60,12 @@ runs:
       run: go env -w GO111MODULE=on
       shell: bash
 
-    - name: Cd into directory and run the program
+    - id: action-output
+      name: Cd into directory and run the program
       run: |
           cd ${{ github.action_path }}/src/carbon-measure-action
           go run ${{ github.action_path }}/src/carbon-measure-action/carbon_measure.go ${{ github.action_path }}/src/carbon-measure-action/githubOutput.go
       shell: bash
+
+
+      
